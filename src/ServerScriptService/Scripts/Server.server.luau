@@ -21,6 +21,8 @@ local EnterPlayzoneFunction: RemoteFunction = Functions:WaitForChild("EnterPlayz
 
 local Levels = ReplicatedStorage:WaitForChild("Levels")
 
+local EnterPlayzoneDebounce = {}
+
 -- Define functions
 
 -- Teleport player to a location
@@ -78,6 +80,11 @@ end
 
 -- Manage joining playzone
 local function OnEnterPlayzone(Player)
+    -- Set debounce for player
+    if EnterPlayzoneDebounce[Player.Name] then return end
+
+    EnterPlayzoneDebounce[Player.Name] = true
+
     -- Prompt player for level and controls, for now just give Level1
 
     -- Send player to limbo
