@@ -2,12 +2,14 @@
 -- Initialized by KingCreoo on 7/18/2024
 
 -- Define services
-
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Define modules
+local _Data = require(ServerScriptService:WaitForChild("Modules"):WaitForChild("Data"))
 
 -- Define variables
-
 local Limbo = workspace:WaitForChild("Limbo")
 local Lobby = workspace:WaitForChild("Lobby")
 
@@ -24,16 +26,40 @@ local function TeleportPlayer(Player: Player, Location: Part, Character: Model)
     Character:SetPrimaryPartCFrame(Location.CFrame + Vector3.new(0,3,0))
 end
 
+-- Setup player's data structure here. ex: leaderstats folder
+local function InitializeDataStructure(Player: Player, PlayerData: table)
+    local leaderstats = Instance.new("Folder")
+    leaderstats.Parent = Player
+    leaderstats.Name = "leaderstats"
+
+    for Name, Value in pairs(PlayerData["leaderstats"]) do
+        local String = type(Value) .. "Value"
+
+        local Stat = Instance.new(string.upper(string.sub(String, 1, 1)) .. string.sub(String, 2, -1))
+        Stat.Name = Name
+        Stat.Value = Value
+        Stat.Parent = leaderstats
+    end
+end
+
 -- Manage onboarding players to the server
 local function OnPlayerAdded(Player)
     -- Recognize player has joined & define basic variables
     print(Player.Name .. " has joined!")
     local Character = Player.Character or Player.CharacterAdded:Wait()
 
+    -- Load player's data
+    local PlayerData, NewPlayer = _Data.Initialize(Player)
+    print(PlayerData, NewPlayer)
+
+    -- Initialize player's folders & items
+    InitializeDataStructure(Player, PlayerData)
+
     -- Player joins, spawns at limbo, and is prompted with load screen
     -- TODO Prompt player with load screen
 
     -- Player exits load screen, we teleport them to the lobby
+    -- TODO Prompt new players with a tutorial
     TeleportPlayer(Player, Lobby.Teleport, Character)
 end
 
