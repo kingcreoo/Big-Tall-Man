@@ -9,11 +9,14 @@ local Players = game:GetService("Players")
 
 -- Define variables
 local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
 
 local EnterPlayzoneFunction: RemoteFunction = ReplicatedStorage:WaitForChild("Functions"):WaitForChild("EnterPlayzone")
 
 local Levels = ReplicatedStorage:WaitForChild("Levels")
 local LevelAnchor = workspace:WaitForChild("LevelAnchor")
+
+local SideMotion = 20
 
 -- Define functions
 
@@ -39,22 +42,37 @@ local function GeneratePlayzone(Level: string)
     LevelClone:SetPrimaryPartCFrame(LevelAnchor.CFrame)
     LevelClone.Parent = workspace
 
-    local Horde = Instance.new("Part")
-    Horde.Anchored = true
-    Horde.CanCollide = false
+    local Horde = ReplicatedStorage:WaitForChild("Horde"):Clone()
     Horde.Parent = LevelClone
-    Horde.Position = LevelClone:WaitForChild("Start").Position
+    Horde:SetPrimaryPartCFrame(LevelClone:WaitForChild("Start").CFrame)
 
     local HordeCamera = Instance.new("Camera")
-    HordeCamera.Parent = Horde
     HordeCamera.CameraType = Enum.CameraType.Follow
-    HordeCamera.CameraSubject = Horde
+    HordeCamera.CameraSubject = LevelClone:WaitForChild("Start")
+    HordeCamera.Parent = LevelClone
     workspace.CurrentCamera = HordeCamera
 
     local MarchTween = TweenService:Create(LevelClone:WaitForChild("Base"), TweenInfo.new((LevelClone:WaitForChild("Start").Position - LevelClone:WaitForChild("End").Position).Magnitude / 4), {Position = LevelClone:WaitForChild("End").Position})
     task.wait(1)
     print("playing tween")
     MarchTween:Play()
+
+    RunService.Heartbeat:Connect(function()
+        local MouseHit = Mouse.Hit
+
+        -- Apply movement limits
+        local targetX = math.clamp(MouseHit.Position.X, (LevelClone.Start.Position.X - SideMotion), (LevelClone.Start.Position.X + SideMotion))
+
+        -- Lerp to the target position
+        local newPosition = Horde.PrimaryPart.Position
+        newPosition = Vector3.new(
+            newPosition.X + (targetX - newPosition.X) * .1,
+            newPosition.Y,
+            newPosition.Z
+        )
+
+        Horde:SetPrimaryPartCFrame(CFrame.new(newPosition))
+    end)
 end
 
 -- Events & function calling
