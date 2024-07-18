@@ -63,6 +63,12 @@ local function OnPlayerAdded(Player)
     TeleportPlayer(Player, Lobby.Teleport, Character)
 end
 
+-- Manage leaving players
+local function OnPlayerRemoving(Player)
+    _Data.Clear(Player)
+end
+
 -- Events & function calling
 
 Players.PlayerAdded:Connect(OnPlayerAdded)
+Players.PlayerRemoving:Connect(OnPlayerRemoving)
