@@ -13,7 +13,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local _Settings = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Settings"))
 
 -- Define variables
-local DataStore = DataStoreService:GetDataStore("_ds_")
+local DataStore = DataStoreService:GetDataStore("_ds_6")
 
 local Database = {}
 local Saves = {}
@@ -61,7 +61,6 @@ function _Data.Set()
 end
 
 function _Data.Initialize(Player: Player)
-    print("ran")
     local PlayerData
     local NewPlayer
 
@@ -85,7 +84,7 @@ function _Data.Initialize(Player: Player)
         PlayerData = DeepReconcile(_Settings.StandardData, PlayerData)
     end
 
-    Database[Player.Name] = {PlayerData}
+    Database[Player.Name] = PlayerData
     Saves[Player.Name] = {}
 
     return PlayerData, NewPlayer
