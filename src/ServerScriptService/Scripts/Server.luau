@@ -1,0 +1,2 @@
+-- Server side core script
+-- Initialized by KingCreoo on 7/18/2024
