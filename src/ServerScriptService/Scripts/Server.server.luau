@@ -13,6 +13,14 @@ local _Data = require(ServerScriptService:WaitForChild("Modules"):WaitForChild("
 local Limbo = workspace:WaitForChild("Limbo")
 local Lobby = workspace:WaitForChild("Lobby")
 
+local EnterPlayzone = Lobby:WaitForChild("EnterPlayzone")
+
+local Events = ReplicatedStorage:WaitForChild("Events")
+local Functions = ReplicatedStorage:WaitForChild("Functions")
+local EnterPlayzoneFunction: RemoteFunction = Functions:WaitForChild("EnterPlayzone")
+
+local Levels = ReplicatedStorage:WaitForChild("Levels")
+
 -- Define functions
 
 -- Teleport player to a location
@@ -68,7 +76,28 @@ local function OnPlayerRemoving(Player)
     _Data.Clear(Player)
 end
 
+-- Manage joining playzone
+local function OnEnterPlayzone(Player)
+    -- Prompt player for level and controls, for now just give Level1
+
+    -- Send player to limbo
+    TeleportPlayer(Player, Limbo:WaitForChild("Teleport"))
+
+    -- Invoke client to generate level & NPC on client-side
+    EnterPlayzoneFunction:InvokeClient(Player, "Level1")
+end
+
 -- Events & function calling
 
 Players.PlayerAdded:Connect(OnPlayerAdded)
 Players.PlayerRemoving:Connect(OnPlayerRemoving)
+
+EnterPlayzone.Touched:Connect(function(hit)
+    if not hit.Parent:FindFirstChild("Humanoid") then return end
+
+    local Player = Players:GetPlayerFromCharacter(hit.Parent)
+
+    if not Player then return end
+
+    OnEnterPlayzone(Player)
+end)
