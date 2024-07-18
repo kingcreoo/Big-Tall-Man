@@ -52,12 +52,47 @@ end
 
 -- Module functions
 
-function _Data.Get()
-
+-- Return player's data
+function _Data.Get(Player: Player)
+    return Database[Player.Name]
 end
 
-function _Data.Set()
+-- Set player's data to the database and to the datastore(if eligble)
+function _Data.Set(Player: Player, PlayerData: table)
+    Database[Player.Name] = PlayerData -- Set player's data
+    
+    local leaderstats = Player:FindFirstChild("leaderstats")
+    if leaderstats then
+        for Stat, Value in pairs(PlayerData["leaderstats"]) do -- Update player's leaderstat data here
+            leaderstats:WaitForChild(Stat).Value = Value
+        end
+    end
+    
 
+    local TimeOfTransaction = os.time()
+    local ToSave
+
+    if not Saves[Player.Name] then -- Find if the player is eligable for a save at TimeOfTransaction
+        ToSave = true
+    else
+        if Saves[Player.Name] - TimeOfTransaction > 60 then
+            ToSave = true
+        end
+    end
+
+    if not ToSave then return end -- If ineligble for save then return
+
+    Saves[Player.name] = TimeOfTransaction
+
+    local Success, ErrorMessage = pcall(function()
+        DataStore:SetAsync("Player_" .. Players:GetUserIdFromNameAsync(Player.Name), PlayerData) -- Save the player's data
+    end)
+
+    if not Success then 
+        warn(ErrorMessage) -- If there was an error in the save: warn of error (maybe write some kind of warning for the player in the future)
+        -- TODO warn player that there data has saved incorrectly
+        -- TODO create contingency methods
+    end
 end
 
 function _Data.Initialize(Player: Player)
@@ -85,7 +120,6 @@ function _Data.Initialize(Player: Player)
     end
 
     Database[Player.Name] = PlayerData
-    Saves[Player.Name] = {}
 
     return PlayerData, NewPlayer
 end
