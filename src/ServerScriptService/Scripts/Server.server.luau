@@ -17,6 +17,7 @@ local EnterPlayzone = Lobby:WaitForChild("EnterPlayzone")
 
 local Events = ReplicatedStorage:WaitForChild("Events")
 local ReflectHordeEvent: RemoteEvent = Events:WaitForChild("ReflectHorde")
+local FireHordeEvent: RemoteEvent = Events:WaitForChild("FireHorde")
 
 local Functions = ReplicatedStorage:WaitForChild("Functions")
 local EnterPlayzoneFunction: RemoteFunction = Functions:WaitForChild("EnterPlayzone")
@@ -143,6 +144,13 @@ local function OnEnterPlayzone(Player)
 
     -- Invoke client to generate level & NPC on client-side
     EnterPlayzoneFunction:InvokeClient(Player, "Level1", 3, 20, PlayerHorde) -- for now pipe in basic level args
+
+    local FireSequence = coroutine.wrap(function()
+        while true do
+            task.wait(1)
+            FireHordeEvent:FireClient(Player, PlayerHorde)
+        end
+    end)()
 end
 
 -- Events & function calling

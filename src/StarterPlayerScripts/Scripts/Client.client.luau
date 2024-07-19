@@ -13,6 +13,7 @@ local Mouse = LocalPlayer:GetMouse()
 
 local Events = ReplicatedStorage:WaitForChild("Events")
 local ReflectHordeEvent: RemoteEvent = Events:WaitForChild("ReflectHorde")
+local FireHordeEvent: RemoteEvent = Events:WaitForChild("FireHorde")
 
 local Functions = ReplicatedStorage:WaitForChild("Functions")
 local EnterPlayzoneFunction: RemoteFunction = Functions:WaitForChild("EnterPlayzone")
@@ -108,6 +109,31 @@ local function ReflectHorde(Horde: table)
     end
 end
 
+-- Fire the horde's weapons
+local function FireHorde(Horde: table)
+    for _, Soldier in pairs(CurrentHorde:GetChildren()) do
+        if Soldier.Name == "HordeAnchor" then continue end
+
+        if Horde[tonumber(Soldier.Name)] == 0 then continue end
+
+        local Bullet = Instance.new("Part")
+        Bullet.Position = Soldier.Position
+        Bullet.Size = Vector3.new(.5,.5,3)
+        Bullet.Material = Enum.Material.SmoothPlastic
+        Bullet.BrickColor = BrickColor.new("New Yeller")
+        Bullet.Anchored = true
+        Bullet.CanCollide = false
+        Bullet.Parent = workspace
+
+        local BulletTween = TweenService:Create(Bullet, TweenInfo.new(.7), {Position = Bullet.Position + Vector3.new(0,0,-50)})
+        BulletTween:Play()
+
+        BulletTween.Completed:Connect(function()
+            Bullet:Destroy()
+        end)
+    end
+end
+
 -- Events & function calling
 
 EnterPlayzoneFunction.OnClientInvoke = function(LevelName: string, WaitTime: number, LevelSideMotion: number, StartingHorde: table)
@@ -125,3 +151,4 @@ EnterPlayzoneFunction.OnClientInvoke = function(LevelName: string, WaitTime: num
 end
 
 ReflectHordeEvent.OnClientEvent:Connect(ReflectHorde)
+FireHordeEvent.OnClientEvent:Connect(FireHorde)
