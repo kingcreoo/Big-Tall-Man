@@ -16,6 +16,8 @@ local Lobby = workspace:WaitForChild("Lobby")
 local EnterPlayzone = Lobby:WaitForChild("EnterPlayzone")
 
 local Events = ReplicatedStorage:WaitForChild("Events")
+local ReflectHordeEvent: RemoteEvent = Events:WaitForChild("ReflectHorde")
+
 local Functions = ReplicatedStorage:WaitForChild("Functions")
 local EnterPlayzoneFunction: RemoteFunction = Functions:WaitForChild("EnterPlayzone")
 
@@ -90,8 +92,57 @@ local function OnEnterPlayzone(Player)
     -- Send player to limbo
     TeleportPlayer(Player, Limbo:WaitForChild("Teleport"))
 
+    -- TODO setup level configs: base horde, waitimes, speed, sidemotion, etc.
+    -- For now, just give basic things
+    local PlayerHorde = {
+        [1] = 1,
+        [2] = 1,
+        [3] = 0,
+        [4] = 0,
+        [5] = 0,
+        [6] = 0,
+        [7] = 0,
+        [8] = 0,
+        [9] = 0,
+        [10] = 0,
+        [11] = 0,
+        [12] = 0,
+        [13] = 0,
+        [14] = 0,
+        [15] = 0,
+        [16] = 0,
+        [17] = 0,
+        [18] = 0,
+        [19] = 0,
+        [20] = 0,
+        [21] = 0,
+        [22] = 0,
+        [23] = 0,
+        [24] = 0
+    }
+
+    local function AddSoldier()
+        for i = 1, #PlayerHorde do
+            if PlayerHorde[i] == 0 then
+                PlayerHorde[i] = 1
+                    ReflectHordeEvent:FireClient(Player, PlayerHorde)
+                break
+            end
+        end
+    end
+
+    local function RemoveSoldier()
+        for i = #PlayerHorde, 1, -1 do
+            if PlayerHorde[i] == 1 then
+                PlayerHorde[i] = 0
+                    ReflectHordeEvent:FireClient(Player, PlayerHorde)
+                break
+            end
+        end
+    end
+
     -- Invoke client to generate level & NPC on client-side
-    EnterPlayzoneFunction:InvokeClient(Player, "Level1", 3, 20) -- for now pipe in basic level args
+    EnterPlayzoneFunction:InvokeClient(Player, "Level1", 3, 20, PlayerHorde) -- for now pipe in basic level args
 end
 
 -- Events & function calling

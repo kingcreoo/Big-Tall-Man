@@ -11,12 +11,17 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
-local EnterPlayzoneFunction: RemoteFunction = ReplicatedStorage:WaitForChild("Functions"):WaitForChild("EnterPlayzone")
+local Events = ReplicatedStorage:WaitForChild("Events")
+local ReflectHordeEvent: RemoteEvent = Events:WaitForChild("ReflectHorde")
+
+local Functions = ReplicatedStorage:WaitForChild("Functions")
+local EnterPlayzoneFunction: RemoteFunction = Functions:WaitForChild("EnterPlayzone")
 
 local Levels = ReplicatedStorage:WaitForChild("Levels")
 local LevelAnchor = workspace:WaitForChild("LevelAnchor")
 
 local Controls
+local CurrentHorde
 
 -- Define functions
 
@@ -48,6 +53,7 @@ local function GeneratePlayzone(LevelName: string)
     local Horde = ReplicatedStorage:WaitForChild("Horde"):Clone()
     Horde.Parent = LevelClone
     Horde:SetPrimaryPartCFrame(LevelClone:WaitForChild("Start").CFrame)
+    CurrentHorde = Horde
 
     -- Generate camera
     local HordeCamera = Instance.new("Camera")
@@ -91,9 +97,20 @@ local function TerminateControls()
     Controls:Disconnect()
 end
 
+-- Reflect horde based on given args
+local function ReflectHorde(Horde: table)
+    for Slot, Soldier in pairs(Horde) do
+        if Soldier == 1 then
+            CurrentHorde:FindFirstChild(Slot).Transparency = 0
+        elseif Soldier == 0 then
+            CurrentHorde:FindFirstChild(Slot).Transparency = 1
+        end
+    end
+end
+
 -- Events & function calling
 
-EnterPlayzoneFunction.OnClientInvoke = function(LevelName: string, WaitTime: number, LevelSideMotion: number)
+EnterPlayzoneFunction.OnClientInvoke = function(LevelName: string, WaitTime: number, LevelSideMotion: number, StartingHorde: table)
     local Level, Horde = GeneratePlayzone(LevelName)
 
     coroutine.wrap(function()
@@ -102,5 +119,9 @@ EnterPlayzoneFunction.OnClientInvoke = function(LevelName: string, WaitTime: num
 
     GenerateControls(Level, Horde, LevelSideMotion)
 
+    ReflectHorde(StartingHorde)
+
     return
 end
+
+ReflectHordeEvent.OnClientEvent:Connect(ReflectHorde)
