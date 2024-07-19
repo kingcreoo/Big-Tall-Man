@@ -91,7 +91,7 @@ local function OnEnterPlayzone(Player)
     TeleportPlayer(Player, Limbo:WaitForChild("Teleport"))
 
     -- Invoke client to generate level & NPC on client-side
-    EnterPlayzoneFunction:InvokeClient(Player, "Level1")
+    EnterPlayzoneFunction:InvokeClient(Player, "Level1", 3, 20) -- for now pipe in basic level args
 end
 
 -- Events & function calling
@@ -99,6 +99,7 @@ end
 Players.PlayerAdded:Connect(OnPlayerAdded)
 Players.PlayerRemoving:Connect(OnPlayerRemoving)
 
+-- Manage when player's want to join the playzone
 EnterPlayzone.Touched:Connect(function(hit)
     if not hit.Parent:FindFirstChild("Humanoid") then return end
 
