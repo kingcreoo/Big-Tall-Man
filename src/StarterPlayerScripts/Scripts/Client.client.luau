@@ -68,7 +68,7 @@ end
 
 -- Generate march animation
 local function GenerateMarch(Level, WaitTime)
-    local MarchTween = TweenService:Create(Level:WaitForChild("Base"), TweenInfo.new((Level:WaitForChild("Start").Position - Level:WaitForChild("End").Position).Magnitude / 4), {Position = Level:WaitForChild("End").Position})
+    local MarchTween = TweenService:Create(Level:WaitForChild("Base"), TweenInfo.new((Level:WaitForChild("Start").Position - Level:WaitForChild("End").Position).Magnitude / 4), {CFrame = Level:WaitForChild("End").CFrame})
     task.wait(WaitTime)
     MarchTween:Play()
 end
