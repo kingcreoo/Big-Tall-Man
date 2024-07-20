@@ -13,8 +13,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer: Player = Players.LocalPlayer
 local PlayerGui: PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local CloseElementBindable: BindableEvent = script:WaitForChild("CloseElement")
-local OpenElementBindable: BindableEvent = script:WaitForChild("OpenElement")
+local CloseElementBindable: BindableEvent = Instance.new("BindableEvent")
+CloseElementBindable.Name = "CloseElement"
+CloseElementBindable.Parent = script
+
+local OpenElementBindable: BindableEvent = Instance.new("BindableEvent")
+OpenElementBindable.Name = "OpenElement"
+OpenElementBindable.Parent = script
 
 local Events = ReplicatedStorage:WaitForChild("Events")
 local Functions = ReplicatedStorage:WaitForChild("Functions")
