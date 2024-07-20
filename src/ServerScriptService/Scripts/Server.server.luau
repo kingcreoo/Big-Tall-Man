@@ -12,6 +12,10 @@ local _Data = require(ServerScriptService:WaitForChild("Modules"):WaitForChild("
 -- Define variables
 local Limbo = workspace:WaitForChild("Limbo")
 local Lobby = workspace:WaitForChild("Lobby")
+local PlayButton = Lobby:WaitForChild("EnterPlayzone")
+
+local Events = ReplicatedStorage:WaitForChild("Events")
+local JoinGamePromptEvent: RemoteEvent = Events:WaitForChild("JoinGamePrompt")
 
 -- Define functions
 
@@ -24,6 +28,11 @@ local function TeleportPlayer(Player: Player, Location: Part, Character: Model)
 
     -- Add three studs on the y axis here so that the player stands on top of it rather than inside of it
     Character:SetPrimaryPartCFrame(Location.CFrame + Vector3.new(0,3,0))
+end
+
+-- Manage joining & leaving a game
+local function PlayButtonPressed(Player: Player)
+    JoinGamePromptEvent:FireClient(Player, "JoinGamePromptFrame", true, false)
 end
 
 -- Setup player's data structure here. ex: leaderstats folder
@@ -72,3 +81,12 @@ end
 
 Players.PlayerAdded:Connect(OnPlayerAdded)
 Players.PlayerRemoving:Connect(OnPlayerRemoving)
+
+PlayButton.Touched:Connect(function(hit)
+    if not hit.Parent:FindFirstChild("Humanoid") then return end
+
+    local Player = Players:GetPlayerFromCharacter(hit.Parent)
+    if not Player then return end
+
+    PlayButtonPressed:Connect(Player)
+end)
