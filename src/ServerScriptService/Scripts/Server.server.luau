@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Define modules
 local _Data = require(ServerScriptService:WaitForChild("Modules"):WaitForChild("Data"))
+local _Environment = require(ServerScriptService:WaitForChild("Modules"):WaitForChild("Environment"))
 
 -- Define variables
 local Limbo = workspace:WaitForChild("Limbo")
@@ -30,9 +31,16 @@ local function TeleportPlayer(Player: Player, Location: Part, Character: Model)
     Character:SetPrimaryPartCFrame(Location.CFrame + Vector3.new(0,3,0))
 end
 
--- Manage joining & leaving a game
+-- Prompt player to join game
 local function PlayButtonPressed(Player: Player)
     JoinGamePromptEvent:FireClient(Player, "JoinGamePromptFrame", true, false)
+end
+
+-- Manage player joining a game
+local function PlayGame(Player: Player, LevelID: string)
+    local GameEnvironment = _Environment.Create(Player, LevelID)
+
+    print(GameEnvironment.Player, GameEnvironment.LevelID)
 end
 
 -- Setup player's data structure here. ex: leaderstats folder
@@ -88,5 +96,7 @@ PlayButton.Touched:Connect(function(hit)
     local Player = Players:GetPlayerFromCharacter(hit.Parent)
     if not Player then return end
 
-    PlayButtonPressed:Connect(Player)
+    PlayButtonPressed(Player)
 end)
+
+JoinGamePromptEvent.OnServerEvent:Connect(PlayGame)
