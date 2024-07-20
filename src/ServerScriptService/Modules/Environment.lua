@@ -64,7 +64,7 @@ function _Environment.Create(Player: Player, LevelID: string)
     self.Anchor = SelectAnchor()
     self.Level = CreateLevel(Player, LevelID, self.Anchor)
 
-    self.HordeTable = table.clone(_Settings.LevelData[self.LevelID])
+    self.HordeTable = table.clone(_Settings.LevelData[self.LevelID]["StartingHorde"])
 
     -- Generate base horde
     -- TODO with level's base horde
@@ -77,9 +77,7 @@ function _Environment.Create(Player: Player, LevelID: string)
     TeleportPlayerBindable:Fire(Player, workspace:WaitForChild("Limbo"):WaitForChild("Teleport"))
     ToggleControlsEvent:FireClient(Player, 0)
 
-    GenerateEnvironmentEvent:FireClient(Player, self.Level, 20 --[[fix here]] )
-    -- TODO camera
-    -- TODO env controls
+    GenerateEnvironmentEvent:FireClient(Player, self.Level, self.HordeTable ,20 --[[fix here]] )
 
     -- TODO reflect horde
 
