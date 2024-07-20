@@ -12,10 +12,18 @@ local ServerScriptService: ServerScriptService = game:GetService("ServerScriptSe
 
 -- Define modules
 local _Data = require(ServerScriptService:WaitForChild("Modules"):WaitForChild("Data"))
+local _Settings = require(ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Settings"))
 
 -- Define variables
 local LevelAnchors = workspace:WaitForChild("LevelAnchors")
 local ActiveLevels = workspace:WaitForChild("ActiveLevels")
+
+local Bindables = ReplicatedStorage:WaitForChild("Bindables")
+local TeleportPlayerBindable: BindableEvent = Bindables:WaitForChild("TeleportPlayer")
+
+local Events = ReplicatedStorage:WaitForChild("Events")
+local ToggleControlsEvent: RemoteEvent = Events:WaitForChild("ToggleControls")
+local GenerateEnvironmentEvent: RemoteEvent = Events:WaitForChild("GenerateEnvironment")
 
 -- Local functions
 
@@ -55,6 +63,25 @@ function _Environment.Create(Player: Player, LevelID: string)
 
     self.Anchor = SelectAnchor()
     self.Level = CreateLevel(Player, LevelID, self.Anchor)
+
+    self.HordeTable = table.clone(_Settings.LevelData[self.LevelID])
+
+    -- Generate base horde
+    -- TODO with level's base horde
+    local Horde = ReplicatedStorage:WaitForChild("Horde"):Clone()
+    Horde.Parent = self.Level
+    Horde:SetPrimaryPartCFrame(self.Level:WaitForChild("Start").CFrame)
+    self.Horde = Horde
+
+    -- Teleport player & terminate controls
+    TeleportPlayerBindable:Fire(Player, workspace:WaitForChild("Limbo"):WaitForChild("Teleport"))
+    ToggleControlsEvent:FireClient(Player, 0)
+
+    GenerateEnvironmentEvent:FireClient(Player, self.Level, 20 --[[fix here]] )
+    -- TODO camera
+    -- TODO env controls
+
+    -- TODO reflect horde
 
     return self
 end

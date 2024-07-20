@@ -18,6 +18,9 @@ local PlayButton = Lobby:WaitForChild("EnterPlayzone")
 local Events = ReplicatedStorage:WaitForChild("Events")
 local JoinGamePromptEvent: RemoteEvent = Events:WaitForChild("JoinGamePrompt")
 
+local Bindables = ReplicatedStorage:WaitForChild("Bindables")
+local TeleportPlayerBindable: BindableEvent = Bindables:WaitForChild("TeleportPlayer")
+
 -- Define functions
 
 -- Teleport player to a location
@@ -100,3 +103,5 @@ PlayButton.Touched:Connect(function(hit)
 end)
 
 JoinGamePromptEvent.OnServerEvent:Connect(PlayGame)
+
+TeleportPlayerBindable.Event:Connect(TeleportPlayer)
