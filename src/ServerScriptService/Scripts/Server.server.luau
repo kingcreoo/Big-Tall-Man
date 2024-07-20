@@ -21,6 +21,9 @@ local JoinGamePromptEvent: RemoteEvent = Events:WaitForChild("JoinGamePrompt")
 local Bindables = ReplicatedStorage:WaitForChild("Bindables")
 local TeleportPlayerBindable: BindableEvent = Bindables:WaitForChild("TeleportPlayer")
 
+local PlayersInGame: table = {}
+local PlayersInPrompt: table = {}
+
 -- Define functions
 
 -- Teleport player to a location
@@ -42,8 +45,7 @@ end
 -- Manage player joining a game
 local function PlayGame(Player: Player, LevelID: string)
     local GameEnvironment = _Environment.Create(Player, LevelID)
-
-    print(GameEnvironment.Player, GameEnvironment.LevelID)
+    PlayersInGame[Player.Name] = true
 end
 
 -- Setup player's data structure here. ex: leaderstats folder
@@ -99,7 +101,15 @@ PlayButton.Touched:Connect(function(hit)
     local Player = Players:GetPlayerFromCharacter(hit.Parent)
     if not Player then return end
 
+    if PlayersInGame[Player.Name] == true then return end
+    if PlayersInPrompt[Player.Name] == true then return end
+
+    PlayersInPrompt[Player.Name] = true
+
     PlayButtonPressed(Player)
+
+    task.wait(2)
+    PlayersInPrompt[Player.Name] = false
 end)
 
 JoinGamePromptEvent.OnServerEvent:Connect(PlayGame)

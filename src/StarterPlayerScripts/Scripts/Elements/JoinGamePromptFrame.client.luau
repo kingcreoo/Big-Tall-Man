@@ -19,12 +19,13 @@ local CloseElementBindable: BindableEvent = script.Parent.Parent:WaitForChild("U
 
 -- Functionality
 
-CancelButton.MouseButton1Down:Connect(function()
+CancelButton.MouseButton1Click:Connect(function()
     CloseElementBindable:Fire(JoinGamePromptFrame)
 end)
 
 for _, Button: TextButton in pairs(Buttons:GetChildren()) do
-    Button.MouseButton1Down:Connect(function()
+    Button.MouseButton1Click:Connect(function()
         JoinGamePromptEvent:FireServer(Button:GetAttribute("LevelID"))
+        CloseElementBindable:Fire(JoinGamePromptFrame)
     end)
 end
